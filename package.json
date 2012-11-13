@@ -1,0 +1,25 @@
+{
+  "name": "twitter-harverster",
+  "version": "0.0.1",
+  "description": "Harvest some tweets into a local mongodb",
+  "main": "app.js",
+  "dependencies": {
+    "mongodb": "~1.1.11",
+    "oauth-client": "~0.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mfloryan/twitter-harverster.git"
+  },
+  "keywords": [
+    "twitter",
+    "node",
+    "mongodb"
+  ],
+  "author": "Marcin Floryan",
+  "license": "Apache License, Version 2.0"
+}
