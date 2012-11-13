@@ -1,5 +1,25 @@
-var oauth = require('oauth-client'),
+var mongo = require('mongodb'),
+    oauth = require('oauth-client'),
     nconf = require('nconf');
+
+nconf.file({file: 'config.json'});
+
+nconf.defaults({
+    mongo: {
+        server: 'localhost',
+        port: 27017,
+        database: 'twitter-harvest'
+    }
+});
+
+var db = (function() {
+    var server = new mongo.Server(
+        nconf.get('mongo:server'),
+        nconf.get('mongo:port'),
+        {auto_reconnect: true});
+    var db = new mongo.Db(nconf.get('mongo:database'), server, {safe: true});
+    return db;
+})();
 
 var twitterFeed = (function() {
     var pub = {};
@@ -71,7 +91,7 @@ var twitterFeed = (function() {
     return pub;
 }());
 
-nconf.file({file: 'config.json'});
+
 twitterFeed.setOAuthDetails(nconf.get('oauth'));
 
 twitterFeed.start("agile");
