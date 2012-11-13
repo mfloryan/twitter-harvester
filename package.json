@@ -5,7 +5,8 @@
   "main": "app.js",
   "dependencies": {
     "mongodb": "~1.1.11",
-    "oauth-client": "~0.3.0"
+    "oauth-client": "~0.3.0",
+    "nconf": "~0.6.5"
   },
   "devDependencies": {},
   "scripts": {
