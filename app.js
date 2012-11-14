@@ -21,7 +21,7 @@ var db = (function() {
     return db;
 })();
 
-var twitterFeed = (function() {
+function TwitterFeed(tweetCallback) {
     var pub = {};
 
     var body = {
@@ -61,9 +61,8 @@ var twitterFeed = (function() {
 
     var handleChunk = function(chunk) {
         if (chunk && chunk.trim()) {
-            console.log("Got new chunk: ");
             var data = JSON.parse(chunk);
-            console.log(data.text);
+            if (data && tweetCallback) saveTweet(data);
         } else {
             console.log('.');
         }
@@ -89,9 +88,23 @@ var twitterFeed = (function() {
     }
 
     return pub;
-}());
+};
 
+var saveTweet = function(tweet) {
+    if (tweet.id) {
+        tweet._id = tweet.id;
+    }
+    db.collection('tweets', function(err, collection) {
+        collection.save(tweet);
+    });
 
-twitterFeed.setOAuthDetails(nconf.get('oauth'));
+    console.log("Saved: " + tweet.id);
+};
 
-twitterFeed.start("agile");
+var twitter = new TwitterFeed(saveTweet);
+
+twitter.setOAuthDetails(nconf.get('oauth'));
+
+db.open(function() {
+    twitter.start("agile");
+});
