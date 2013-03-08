@@ -17,8 +17,7 @@ var db = (function() {
         nconf.get('mongo:server'),
         nconf.get('mongo:port'),
         {auto_reconnect: true});
-    var db = new mongo.Db(nconf.get('mongo:database'), server, {safe: true});
-    return db;
+    return new mongo.Db(nconf.get('mongo:database'), server, {safe:true});
 })();
 
 function TwitterFeed(tweetCallback) {
@@ -44,7 +43,7 @@ function TwitterFeed(tweetCallback) {
             method: 'POST',
             body : body
         }
-    }
+    };
 
     var errorCounter = 0;
 
@@ -57,16 +56,16 @@ function TwitterFeed(tweetCallback) {
         } else {
             console.log("Sorry. Too many errors. Bye!")
         }
-    }
+    };
 
     var handleChunk = function(chunk) {
         if (chunk && chunk.trim()) {
             var data = JSON.parse(chunk);
-            if (data && tweetCallback) saveTweet(data);
+            if (data && tweetCallback) tweetCallback(data);
         } else {
             console.log('.');
         }
-    }
+    };
 
     pub.start = function(itemToTrack) {
         body.track = itemToTrack;
@@ -88,7 +87,7 @@ function TwitterFeed(tweetCallback) {
     }
 
     return pub;
-};
+}
 
 var saveTweet = function(tweet) {
     if (tweet.id) {
@@ -108,3 +107,5 @@ twitter.setOAuthDetails(nconf.get('oauth'));
 db.open(function() {
     twitter.start("agile");
 });
+
+db.close();
