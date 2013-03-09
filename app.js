@@ -20,30 +20,27 @@ var db = (function() {
     return new mongo.Db(nconf.get('mongo:database'), server, {safe:true});
 })();
 
-var saveTweet = function(tweet) {
+var saveTweet = function(tweet, collectionName) {
+    collectionName = collectionName || 'tweets';
     if (tweet.id) {
         tweet._id = tweet.id;
     }
-    db.collection('tweets', function(err, collection) {
+    db.collection(collectionName, function(err, collection) {
         collection.save(tweet);
     });
-
-    console.log("Saved: " + tweet.id);
 };
 
 var feed = new twitter(nconf.get('oauth'));
 
 db.open(function() {
-    //feed.publicStream("agile", saveTweet);
-    feed.publicStream("agile", function (tweet) {
-        console.log("* Got tweet about agile");
-        console.log(tweet.text);
-    })
+//    feed.publicStream("agile", function (tweet) {
+//        console.log("* Got tweet about agile");
+//        console.log(tweet.text);
+//    });
     feed.userStream( function(tweet) {
         var keys = Object.keys(tweet);
         if (keys.length > 1) {
-            console.log("* Got tweet");
-            console.log(tweet.text);
+            saveTweet(tweet, "timeline");
         } else {
             console.log(keys[0]);
         }
