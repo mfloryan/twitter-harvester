@@ -1,7 +1,7 @@
 {
-  "name": "twitter-harverster",
+  "name": "twitter-harvester",
   "version": "0.0.1",
-  "description": "Harvest some tweets into a local mongodb",
+  "description": "Reads twitter stream to persist tweets and expose some cubism stats",
   "main": "app.js",
   "dependencies": {
     "mongodb": "~1.1.11",
@@ -21,6 +21,7 @@
     "node",
     "mongodb"
   ],
-  "author": "Marcin Floryan",
+  "author": { "name": "Marcin Floryan", "url" : "http://marcin.floryan.pl" },
+  "repository": {"type": "git", "url": "https://github.com/mfloryan/twitter-harvester.git"},
   "license": "Apache License, Version 2.0"
 }
