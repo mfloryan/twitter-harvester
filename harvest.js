@@ -50,8 +50,9 @@ db.open(function() {
                 time: new Date(tweet.created_at),
                 data: {
                     'from' : tweet.user.screen_name,
-                    'reply' : tweet.in_reply_to_status_id !== undefined,
-                    'source' : tweet.source
+                    'reply' : tweet.in_reply_to_status_id !== null,
+                    'source' : tweet.source,
+                    'retweet' : tweet.retweeted_status != undefined
                 }
             });
         } else {
