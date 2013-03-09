@@ -2,7 +2,7 @@
   "name": "twitter-harvester",
   "version": "0.0.1",
   "description": "Reads twitter stream to persist tweets and expose some cubism stats",
-  "main": "app.js",
+  "main": "harvest.js",
   "author": {
     "name": "Marcin Floryan",
     "url": "http://marcin.floryan.pl"
