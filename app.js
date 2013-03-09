@@ -34,5 +34,14 @@ var saveTweet = function(tweet) {
 var feed = new twitter(nconf.get('oauth'));
 
 db.open(function() {
-    feed.start("agile", saveTweet);
+    //feed.publicStream("agile", saveTweet);
+    feed.userStream( function(tweet) {
+        var keys = Object.keys(tweet);
+        if (keys.length > 1) {
+            console.log("* Got tweet");
+            console.log(tweet);
+        } else {
+            console.log(keys[0]);
+        }
+    });
 });

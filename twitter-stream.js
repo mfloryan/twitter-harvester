@@ -2,23 +2,18 @@ function twitterStream(config) {
 
     var pub = {};
 
-    var body = {
-        track: ''
-    };
-
     var requestConfig = {
         port: 443,
-        host: 'stream.twitter.com',
         https: true,
-        path: '/1.1/statuses/filter.json',
         oauth_signature: (function(){
             var consumer = oauth.createConsumer(config.consumerKey, config.consumerSecret);
             var token = oauth.createToken(config.accessTokenKey, config.accessTokenSecret);
             return oauth.createHmac(consumer, token)
         }()),
-        method: 'POST',
-        body : body
-    }
+        method: 'POST'
+    };
+
+    var body;
 
     var tweetCallback;
 
@@ -44,15 +39,26 @@ function twitterStream(config) {
         }
     };
 
-    pub.start = function(itemToTrack, itemCallback) {
-        body.track = itemToTrack;
+    pub.publicStream = function(itemToTrack, itemCallback) {
+        requestConfig.host = 'stream.twitter.com';
+        requestConfig.path = '/1.1/statuses/filter.json';
+        body = { "track" : itemToTrack };
         tweetCallback = itemCallback;
         startTwitterFeed();
     };
 
+    pub.userStream = function(itemCallback) {
+        requestConfig.host = 'userstream.twitter.com';
+        requestConfig.path = '/1.1/user.json';
+        body = { "with" : "followings" };
+        tweetCallback = itemCallback;
+        startTwitterFeed();
+    }
+
     function startTwitterFeed() {
         console.log("Connecting...");
         console.log(requestConfig);
+        requestConfig.body = body;
         var request = oauth.request(requestConfig, function(response) {
             console.log("Here is my response code: "+ response.statusCode);
             console.log("Now waiting for some interesting Twitter data");
