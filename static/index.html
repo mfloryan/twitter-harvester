@@ -2,8 +2,52 @@
 <html>
 <head>
     <title>Twitter Harvest stats</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://square.github.com/cubism/cubism.v1.js?1.0.0"></script>
+    <style>
+        @import url(harvest.css);
+    </style>
 </head>
 <body>
+<div id="graph"> </div>
+<script>
+    var context = cubism.context()
+            .step(1e4)
+            .size(1024);
+    var cube = context.cube("http://localhost:1081");
 
+    var metrics = [
+        cube.metric("sum(tweet)"),
+        cube.metric("sum(meta)")
+    ];
+
+    var labels = [
+        'tweets',
+        'meta'
+    ];
+
+    d3.select("#graph").append("div").attr("class","axis")
+            .call(context.axis().orient("top"));
+
+//    d3.select("#graph").selectAll(".axis")
+//            .data(["top", "bottom"])
+//            .enter().append("div")
+//            .attr("class", function(d) { return d + " axis"; })
+//            .each(function(d) { d3.select(this).call(context.axis().ticks(12).orient(d)); });
+
+    d3.select("#graph").append("div")
+            .attr("class", "rule")
+            .call(context.rule());
+
+    d3.select("#graph").selectAll(".horizon")
+            .data(metrics)
+            .enter().append("div")
+            .attr("class", "horizon")
+            .call(context.horizon().title(function(i,d) { return labels[d]}));
+
+    context.on("focus", function(i) {
+        d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+    });
+</script>
 </body>
 </html>
