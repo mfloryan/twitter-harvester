@@ -2,74 +2,76 @@ function twitterStream(config) {
 
     var pub = {};
 
-    var requestConfig = {
-        port: 443,
-        https: true,
-        oauth_signature: (function(){
-            var consumer = oauth.createConsumer(config.consumerKey, config.consumerSecret);
-            var token = oauth.createToken(config.accessTokenKey, config.accessTokenSecret);
-            return oauth.createHmac(consumer, token)
-        }()),
-        method: 'POST'
+    var buildRequestSkeleton = function() {
+        return {
+            port: 443,
+            https: true,
+            oauth_signature: (function(){
+                var consumer = oauth.createConsumer(config.consumerKey, config.consumerSecret);
+                var token = oauth.createToken(config.accessTokenKey, config.accessTokenSecret);
+                return oauth.createHmac(consumer, token)
+            }()),
+            method: 'POST'
+        }
     };
-
-    var body;
-
-    var tweetCallback;
 
     var errorCounter = 0;
 
-    var handleError = function(error) {
+    var handleError = function(error, request, body, callback) {
         errorCounter++;
         console.log("Got an error: " + error);
         if (errorCounter < 5) {
             console.log("Will try again soon");
-            setTimeout(startTwitterFeed, 10000 * errorCounter);
+            setTimeout(startTwitterFeed, 10000 * errorCounter, request, body, callback);
         } else {
             console.log("Sorry. Too many errors. Bye!")
         }
     };
 
-    var handleChunk = function(chunk) {
-        if (chunk && chunk.trim()) {
-            var data = JSON.parse(chunk);
-            if (data && tweetCallback) tweetCallback(data);
-        } else {
-            console.log('.');
+    var provideChunkHandlerFor = function(callback) {
+        return function(chunk) {
+            if (chunk && chunk.trim()) {
+                var data = JSON.parse(chunk);
+                if (data && callback) callback(data);
+            } else {
+                console.log('.');
+            }
         }
     };
 
     pub.publicStream = function(itemToTrack, itemCallback) {
-        requestConfig.host = 'stream.twitter.com';
-        requestConfig.path = '/1.1/statuses/filter.json';
-        body = { "track" : itemToTrack };
-        tweetCallback = itemCallback;
-        startTwitterFeed();
+        var body = { "track" : itemToTrack };
+        var request = buildRequestSkeleton();
+        request.host = 'stream.twitter.com';
+        request.path = '/1.1/statuses/filter.json';
+        request.body = body;
+        startTwitterFeed(request, body, itemCallback);
     };
 
     pub.userStream = function(itemCallback) {
-        requestConfig.host = 'userstream.twitter.com';
-        requestConfig.path = '/1.1/user.json';
-        body = { "with" : "followings" };
-        tweetCallback = itemCallback;
-        startTwitterFeed();
-    }
+        var body = { "with" : "followings" };
+        var request = buildRequestSkeleton();
+        request.host = 'userstream.twitter.com';
+        request.path = '/1.1/user.json';
+        request.body = body;
+        startTwitterFeed(request, body, itemCallback);
+    };
 
-    function startTwitterFeed() {
+    function startTwitterFeed(request, body, callback) {
         console.log("Connecting...");
-        console.log(requestConfig);
-        requestConfig.body = body;
-        var request = oauth.request(requestConfig, function(response) {
+        var request = oauth.request(request, function(response) {
             console.log("Here is my response code: "+ response.statusCode);
             console.log("Now waiting for some interesting Twitter data");
             console.log();
             response.setEncoding('utf8');
-            response.on('data', handleChunk);
+            response.on('data', provideChunkHandlerFor(callback));
         });
 
         request.write(body);
         request.end();
-        request.on('error', handleError);
+        request.on('error', function (error) {
+            handleError(error, request, body, callback);
+        });
     }
 
     return pub;

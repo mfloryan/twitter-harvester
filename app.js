@@ -35,11 +35,15 @@ var feed = new twitter(nconf.get('oauth'));
 
 db.open(function() {
     //feed.publicStream("agile", saveTweet);
+    feed.publicStream("agile", function (tweet) {
+        console.log("* Got tweet about agile");
+        console.log(tweet.text);
+    })
     feed.userStream( function(tweet) {
         var keys = Object.keys(tweet);
         if (keys.length > 1) {
             console.log("* Got tweet");
-            console.log(tweet);
+            console.log(tweet.text);
         } else {
             console.log(keys[0]);
         }
