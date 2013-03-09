@@ -3,6 +3,8 @@ var mongo = require('mongodb'),
     twitter = require('./twitter-stream'),
     cube = require('cube');
 
+require('./stat-server');
+
 nconf.file({file: 'config.json'});
 
 nconf.defaults({
@@ -55,8 +57,11 @@ db.open(function() {
         } else {
             saveTweet(tweet, "meta");
             emitter.send({
-                type: keys[0],
-                time: new Date()
+                type: "meta",
+                time: new Date(),
+                data: {
+                    type: keys[0]
+                }
             });
         }
     });
@@ -64,6 +69,7 @@ db.open(function() {
 
 process.on('SIGINT', function() {
     console.log('Cleaning-up!');
+    emitter.close();
     db.close();
     console.log('Goodbye.');
     process.exit();
