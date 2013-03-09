@@ -46,3 +46,10 @@ db.open(function() {
         }
     });
 });
+
+process.on('SIGINT', function() {
+    console.log('Cleaning-up!');
+    db.close();
+    console.log('Goodbye.');
+    process.exit();
+});
