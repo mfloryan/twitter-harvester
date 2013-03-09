@@ -1,4 +1,5 @@
-var cube = require("cube");
+var cube = require("cube"),
+    connect = require("connect");
 
 var collectorOptions = {
     "mongo-host":"127.0.0.1",
@@ -30,3 +31,7 @@ var registerServer = function (options, cubeSubject) {
 
 registerServer(collectorOptions, cube.collector);
 registerServer(evaluatorOptions, cube.evaluator);
+
+connect.createServer(
+    connect.static(__dirname + '/static')
+).listen(8081);
