@@ -34,7 +34,7 @@ function twitterStream(config) {
                 var data = JSON.parse(chunk);
                 if (data && callback) callback(data);
             } else {
-                console.log('.');
+                process.stdout.write('.');
             }
         }
     };
