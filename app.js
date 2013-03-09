@@ -1,6 +1,7 @@
 var mongo = require('mongodb'),
     nconf = require('nconf'),
-    twitter = require('./twitter-stream')
+    twitter = require('./twitter-stream'),
+    cube = require('cube');
 
 nconf.file({file: 'config.json'});
 
@@ -31,6 +32,7 @@ var saveTweet = function(tweet, collectionName) {
 };
 
 var feed = new twitter(nconf.get('oauth'));
+var emitter = cube.emitter("udp://localhost:1180");
 
 db.open(function() {
 //    feed.publicStream("agile", function (tweet) {
@@ -41,8 +43,21 @@ db.open(function() {
         var keys = Object.keys(tweet);
         if (keys.length > 1) {
             saveTweet(tweet, "timeline");
+            emitter.send({
+                type: 'tweet',
+                time: new Date(tweet.created_at),
+                data: {
+                    'from' : tweet.user.screen_name,
+                    'reply' : tweet.in_reply_to_status_id !== undefined,
+                    'source' : tweet.source
+                }
+            });
         } else {
-            console.log(keys[0]);
+            saveTweet(tweet, "meta");
+            emitter.send({
+                type: keys[0],
+                time: new Date()
+            });
         }
     });
 });
