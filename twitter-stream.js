@@ -1,6 +1,4 @@
-var oauth = require('oauth-client');
-
-function twitterStream(tweetCallback) {
+function twitterStream(config) {
 
     var pub = {};
 
@@ -8,23 +6,21 @@ function twitterStream(tweetCallback) {
         track: ''
     };
 
-    var requestConfig = {};
+    var requestConfig = {
+        port: 443,
+        host: 'stream.twitter.com',
+        https: true,
+        path: '/1.1/statuses/filter.json',
+        oauth_signature: (function(){
+            var consumer = oauth.createConsumer(config.consumerKey, config.consumerSecret);
+            var token = oauth.createToken(config.accessTokenKey, config.accessTokenSecret);
+            return oauth.createHmac(consumer, token)
+        }()),
+        method: 'POST',
+        body : body
+    }
 
-    pub.setOAuthDetails = function(config) {
-        requestConfig = {
-            port: 443,
-            host: 'stream.twitter.com',
-            https: true,
-            path: '/1.1/statuses/filter.json',
-            oauth_signature: (function(){
-                var consumer = oauth.createConsumer(config.consumerKey, config.consumerSecret);
-                var token = oauth.createToken(config.accessTokenKey, config.accessTokenSecret);
-                return oauth.createHmac(consumer, token)
-            }()),
-            method: 'POST',
-            body : body
-        }
-    };
+    var tweetCallback;
 
     var errorCounter = 0;
 
@@ -48,13 +44,15 @@ function twitterStream(tweetCallback) {
         }
     };
 
-    pub.start = function(itemToTrack) {
+    pub.start = function(itemToTrack, itemCallback) {
         body.track = itemToTrack;
+        tweetCallback = itemCallback;
         startTwitterFeed();
     };
 
     function startTwitterFeed() {
         console.log("Connecting...");
+        console.log(requestConfig);
         var request = oauth.request(requestConfig, function(response) {
             console.log("Here is my response code: "+ response.statusCode);
             console.log("Now waiting for some interesting Twitter data");
@@ -70,5 +68,7 @@ function twitterStream(tweetCallback) {
 
     return pub;
 }
+
+var oauth = require('oauth-client');
 
 module.exports = twitterStream;

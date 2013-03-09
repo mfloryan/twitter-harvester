@@ -17,10 +17,8 @@ var db = (function() {
         nconf.get('mongo:server'),
         nconf.get('mongo:port'),
         {auto_reconnect: true});
-    console.log('Connected to Mongo');
     return new mongo.Db(nconf.get('mongo:database'), server, {safe:true});
 })();
-
 
 var saveTweet = function(tweet) {
     if (tweet.id) {
@@ -33,10 +31,8 @@ var saveTweet = function(tweet) {
     console.log("Saved: " + tweet.id);
 };
 
-var feed = new twitter(saveTweet);
-
-feed.setOAuthDetails(nconf.get('oauth'));
+var feed = new twitter(nconf.get('oauth'));
 
 db.open(function() {
-    feed.start("agile");
+    feed.start("agile", saveTweet);
 });
