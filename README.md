@@ -1,7 +1,11 @@
-twitter-harverster
+twitter-harvester
 ==================
 
-Harvest some interesting tweets into a mongodb
+Simple [node.js](http://nodejs.org/) application to harvest tweets from twitter
+using their [streaming API](https://dev.twitter.com/docs/streaming-apis),
+archive them in [MongoDB](http://www.mongodb.org/display/DOCS/Home),
+gather stats using [cube](http://square.github.com/cube/)
+and show them using [cubism](square.github.com/cubism/).
 
 ## Config
 
