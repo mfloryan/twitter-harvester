@@ -5,12 +5,14 @@
   "main": "app.js",
   "author": {
     "name": "Marcin Floryan",
-    "url" : "http://marcin.floryan.pl"
+    "url": "http://marcin.floryan.pl"
   },
   "dependencies": {
     "mongodb": ">=1.1.11",
     "oauth-client": ">=0.3.0",
-    "nconf": ">=0.6.7"
+    "nconf": ">=0.6.7",
+    "cube": "~0.2.4",
+    "cubism": "~1.2.2"
   },
   "devDependencies": {},
   "scripts": {
