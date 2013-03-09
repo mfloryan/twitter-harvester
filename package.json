@@ -3,10 +3,14 @@
   "version": "0.0.1",
   "description": "Reads twitter stream to persist tweets and expose some cubism stats",
   "main": "app.js",
+  "author": {
+    "name": "Marcin Floryan",
+    "url" : "http://marcin.floryan.pl"
+  },
   "dependencies": {
-    "mongodb": "~1.1.11",
-    "oauth-client": "~0.3.0",
-    "nconf": "~0.6.5"
+    "mongodb": ">=1.1.11",
+    "oauth-client": ">=0.3.0",
+    "nconf": ">=0.6.7"
   },
   "devDependencies": {},
   "scripts": {
@@ -14,14 +18,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mfloryan/twitter-harverster.git"
+    "url": "https://github.com/mfloryan/twitter-harvester.git"
   },
   "keywords": [
     "twitter",
     "node",
     "mongodb"
   ],
-  "author": { "name": "Marcin Floryan", "url" : "http://marcin.floryan.pl" },
-  "repository": {"type": "git", "url": "https://github.com/mfloryan/twitter-harvester.git"},
   "license": "Apache License, Version 2.0"
 }
