@@ -1,3 +1,6 @@
+var oauth = require('oauth-client'),
+    tweeterUnderstanding = require('./lib/understand-twitter-stream');
+
 function twitterStream(config) {
 
     var pub = {};
@@ -33,7 +36,7 @@ function twitterStream(config) {
             if (chunk && chunk.trim()) {
                 var data = JSON.parse(chunk);
                 try {
-                    if (data && callback) callback(data);
+                    if (data && callback) callback(tweeterUnderstanding.transform(data));
                 } catch (e) {
                     console.log(e);
                 }
@@ -80,7 +83,5 @@ function twitterStream(config) {
 
     return pub;
 }
-
-var oauth = require('oauth-client');
 
 module.exports = twitterStream;
