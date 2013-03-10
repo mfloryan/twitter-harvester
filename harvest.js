@@ -23,13 +23,15 @@ var db = (function() {
     return new mongo.Db(nconf.get('mongo:database'), server, {safe:true});
 })();
 
-var saveTweet = function(tweet, collectionName) {
-    collectionName = collectionName || 'tweets';
-    if (tweet.id) {
-        tweet._id = tweet.id;
+var saveData = function(data, collectionName) {
+    collectionName = collectionName || 'timeline';
+
+    if (data.id) {
+        data._id = data.id;
     }
+
     db.collection(collectionName, function(err, collection) {
-        collection.save(tweet);
+        collection.save(data);
     });
 };
 
@@ -41,29 +43,37 @@ db.open(function() {
 //        console.log("* Got tweet about agile");
 //        console.log(tweet.text);
 //    });
-    feed.userStream( function(tweet) {
-        var keys = Object.keys(tweet);
-        if (keys.length > 1) {
-            saveTweet(tweet, "timeline");
+    feed.userStream( function(event) {
+
+        if (event.event == 'posted' && event.subject == 'tweet') {
+            process.stdout.write('+');
+            saveData(event.content, "timeline");
             emitter.send({
                 type: 'tweet',
-                time: new Date(tweet.created_at),
+                time: new Date(event.content.created_at),
                 data: {
-                    'from' : tweet.user.screen_name,
-                    'reply' : tweet.in_reply_to_status_id !== null,
-                    'source' : tweet.source,
-                    'retweet' : tweet.retweeted_status != undefined
+                    'from' : event.content.user.screen_name,
+                    'reply' : event.content.in_reply_to_status_id !== null,
+                    'source' : event.content.source,
+                    'retweet' : event.content.hasOwnProperty('retweeted_status')
                 }
             });
         } else {
-            saveTweet(tweet, "meta");
-            emitter.send({
-                type: "meta",
+            process.stdout.write(':');
+            saveData(event, "meta");
+            var emittedEvent = {
+                type: 'meta',
                 time: new Date(),
                 data: {
-                    type: keys[0]
+                    event: event.event
                 }
-            });
+            };
+
+            if (event.hasOwnProperty('subject')) {
+                emittedEvent.data.subject = event.subject;
+            }
+
+            emitter.send(emittedEvent);
         }
     });
 });
