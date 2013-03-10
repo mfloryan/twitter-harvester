@@ -32,7 +32,11 @@ function twitterStream(config) {
         return function(chunk) {
             if (chunk && chunk.trim()) {
                 var data = JSON.parse(chunk);
-                if (data && callback) callback(data);
+                try {
+                    if (data && callback) callback(data);
+                } catch (e) {
+                    console.log(e);
+                }
             } else {
                 process.stdout.write('.');
             }
