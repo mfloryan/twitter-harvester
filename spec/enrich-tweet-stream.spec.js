@@ -117,7 +117,7 @@ describe("Enrich twitter events", function() {
         expect(event.statusId).toBe(data.id);
     });
 
-    it ("can enrich explicit event", function() {
+    it ("can enrich explicit favorite event", function() {
         var data = { "event" : "favorite",
             "created_at" : "Sun Mar 10 01:15:37 +0000 2013",
             "target" : { "profile_banner_url" : "https://twimg0-a.akamaihd.net/profile_banners/39249507/1348652087",
@@ -262,5 +262,17 @@ describe("Enrich twitter events", function() {
         expect(event.event).toBe('favorite');
         expect(event.statusId).toBe(data.target_object.id);
     });
+
+    it ("can wrap any other event", function() {
+        var data = {
+            "created_at" : "Sun Mar 10 01:15:37 +0000 2013"
+        };
+
+        var event = twitterEvents.transform(data);
+
+        expect(event.content).toBe(data);
+        expect(event.event).toBe('unknown');
+    });
+
 
 });
