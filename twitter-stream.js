@@ -65,7 +65,7 @@ function twitterStream(config) {
     };
 
     function startTwitterFeed(request, body, callback) {
-        console.log("Connecting...");
+        console.log("Connecting to twitter stream...");
         var request = oauth.request(request, function(response) {
             console.log("Here is my response code: "+ response.statusCode);
             console.log("Now waiting for some interesting Twitter data");
