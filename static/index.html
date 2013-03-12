@@ -12,9 +12,10 @@
 <div id="graph"> </div>
 <script>
     var context = cubism.context()
-            .step(1e4)
+            .step(3e5)
             .size(1024);
-    var cube = context.cube("http://localhost:1081");
+    var hostname = window.location.hostname;
+    var cube = context.cube("http://"+hostname+":1081");
 
     var metrics = [
         cube.metric("sum(tweet)"),
