@@ -11,7 +11,7 @@ nconf.defaults({
     mongo: {
         server: 'localhost',
         port: 27017,
-        database: 'twitter-harvest'
+        database: 'twitter_harvest'
     }
 });
 
@@ -22,6 +22,9 @@ var db = (function() {
         {auto_reconnect: true});
     return new mongo.Db(nconf.get('mongo:database'), server, {safe:true});
 })();
+
+var feed = new twitter(nconf.get('oauth'));
+var emitter = cube.emitter("udp://localhost:1180");
 
 var saveData = function(data, collectionName) {
     collectionName = collectionName || 'timeline';
@@ -37,8 +40,34 @@ var saveData = function(data, collectionName) {
     });
 };
 
-var feed = new twitter(nconf.get('oauth'));
-var emitter = cube.emitter("udp://localhost:1180");
+function emitTweet(tweetEvent) {
+    emitter.send({
+        type: 'tweet',
+        time: new Date(event.content.created_at),
+        data: {
+            'from' : event.content.user.screen_name,
+            'reply' : event.content.in_reply_to_status_id !== null,
+            'source' : event.content.source,
+            'retweet' : event.content.hasOwnProperty('retweeted_status')
+        }
+    });
+}
+
+function emitMeta(event) {
+    var emittedEvent = {
+        type:'meta',
+        time:new Date(),
+        data:{
+            event:event.event
+        }
+    };
+
+    if (event.hasOwnProperty('subject')) {
+        emittedEvent.data.subject = event.subject;
+    }
+
+    emitter.send(emittedEvent);
+}
 
 db.open(function() {
 //    feed.publicStream("agile", function (tweet) {
@@ -50,32 +79,11 @@ db.open(function() {
         if (event.event == 'posted' && event.subject == 'tweet') {
             process.stdout.write('+');
             saveData(event.content, "timeline");
-            emitter.send({
-                type: 'tweet',
-                time: new Date(event.content.created_at),
-                data: {
-                    'from' : event.content.user.screen_name,
-                    'reply' : event.content.in_reply_to_status_id !== null,
-                    'source' : event.content.source,
-                    'retweet' : event.content.hasOwnProperty('retweeted_status')
-                }
-            });
+            emitTweet(event);
         } else {
             process.stdout.write(':');
             saveData(event, "meta");
-            var emittedEvent = {
-                type: 'meta',
-                time: new Date(),
-                data: {
-                    event: event.event
-                }
-            };
-
-            if (event.hasOwnProperty('subject')) {
-                emittedEvent.data.subject = event.subject;
-            }
-
-            emitter.send(emittedEvent);
+            emitMeta(event);
         }
     });
 });
