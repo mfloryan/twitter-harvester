@@ -30,8 +30,10 @@ var saveData = function(data, collectionName) {
         data._id = data.id;
     }
 
-    db.collection(collectionName, function(err, collection) {
-        collection.save(data);
+    db.collection(collectionName).insert(data, function(err, inserted) {
+        if (err) {
+            console.log(err);
+        }
     });
 };
 
