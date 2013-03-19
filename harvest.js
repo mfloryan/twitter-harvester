@@ -7,7 +7,7 @@ nconf.argv()
      .file({file: 'config.json'});
 
 nconf.defaults({
-    mongo: {
+    mongo_harvest: {
         server: 'localhost',
         port: 27017,
         database: 'twitter_harvest'
@@ -20,10 +20,10 @@ if (nconf.get('server')) {
 
 var db = (function() {
     var server = new mongo.Server(
-        nconf.get('mongo:server'),
-        nconf.get('mongo:port'),
+        nconf.get('mongo_harvest:server'),
+        nconf.get('mongo_harvest:port'),
         {auto_reconnect: true});
-    return new mongo.Db(nconf.get('mongo:database'), server, {safe:true});
+    return new mongo.Db(nconf.get('mongo_harvest:database'), server, {safe:true});
 })();
 
 var feed = new twitter(nconf.get('oauth'));
