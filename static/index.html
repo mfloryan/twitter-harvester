@@ -19,12 +19,14 @@
 
     var metrics = [
         cube.metric("sum(tweet)"),
-        cube.metric("sum(meta)")
+        cube.metric("sum(meta)"),
+        cube.metric("sum(topic)")
     ];
 
     var labels = [
         'tweets',
-        'meta'
+        'meta',
+        'topic'
     ];
 
     d3.select("#graph").append("div").attr("class","axis")
@@ -44,7 +46,10 @@
             .data(metrics)
             .enter().append("div")
             .attr("class", "horizon")
-            .call(context.horizon().title(function(i,d) { return labels[d]}));
+            .call(
+                context.horizon()
+                        .title(function(i,d) { return labels[d]})
+                        .height(80));
 
     context.on("focus", function(i) {
         d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
