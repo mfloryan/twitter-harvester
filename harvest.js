@@ -40,7 +40,7 @@ var saveData = function(data, collectionName) {
     });
 };
 
-function emitTweet(tweetEvent) {
+function emitTweet(event) {
     emitter.send({
         type: 'tweet',
         time: new Date(event.content.created_at),
