@@ -10,6 +10,9 @@ nconf.defaults({
             port: 8081
         }
     },
+    evaluator: {
+        port: 1081
+    },
     mongo_cube: {
         server: 'localhost',
         port: 27017,
@@ -33,7 +36,7 @@ var evaluatorOptions = {
     "mongo-database":nconf.get('mongo_cube:database'),
     "mongo-username":null,
     "mongo-password":null,
-    "http-port":1081
+    "http-port":nconf.get('evaluator:port')
 };
 
 var registerServer = function (options, cubeSubject) {

@@ -60,6 +60,16 @@ Other configuration options.
 }
 ```
 
+### Port for the evaluator service (connected to from the front-end)
+
+```json
+{
+    "evaluator": {
+        "port": 1081
+    }
+}
+```
+
 ## Command-line
 
 `node harvest.js --server` to start the stat server or in a separate process `node stat-server.js`
