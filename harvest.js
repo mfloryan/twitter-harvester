@@ -3,9 +3,8 @@ var mongo = require('mongodb'),
     twitter = require('./twitter-stream'),
     cube = require('cube');
 
-require('./stat-server');
-
-nconf.file({file: 'config.json'});
+nconf.argv()
+     .file({file: 'config.json'});
 
 nconf.defaults({
     mongo: {
@@ -14,6 +13,10 @@ nconf.defaults({
         database: 'twitter_harvest'
     }
 });
+
+if (nconf.get('server')) {
+    require('./stat-server');
+}
 
 var db = (function() {
     var server = new mongo.Server(
