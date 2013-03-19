@@ -40,8 +40,6 @@ function twitterStream(config) {
                 } catch (e) {
                     console.log(e);
                 }
-            } else {
-                process.stdout.write('.');
             }
         }
     };

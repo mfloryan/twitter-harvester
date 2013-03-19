@@ -102,11 +102,9 @@ db.open(function() {
         feed.userStream( function(event) {
 
             if (event.event == 'posted' && event.subject == 'tweet') {
-                process.stdout.write('+');
                 saveData(event.content, "timeline");
                 emitTweet(event);
             } else {
-                process.stdout.write(':');
                 saveData(event, "meta");
                 emitMeta(event);
             }
