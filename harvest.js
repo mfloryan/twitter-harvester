@@ -56,6 +56,20 @@ function emitTweet(event) {
     });
 }
 
+function emitTopic(event, topic) {
+    emitter.send({
+        type: 'topic',
+        time: new Date(event.content.created_at),
+        data: {
+            'topic' : topic,
+            'from' : event.content.user.screen_name,
+            'reply' : event.content.in_reply_to_status_id !== null,
+            'source' : event.content.source,
+            'retweet' : event.content.hasOwnProperty('retweeted_status')
+        }
+    });
+}
+
 function emitMeta(event) {
     var emittedEvent = {
         type:'meta',
@@ -73,22 +87,31 @@ function emitMeta(event) {
 }
 
 db.open(function() {
-//    feed.publicStream("agile", function (tweet) {
-//        console.log("* Got tweet about agile");
-//        console.log(tweet.text);
-//    });
-    feed.userStream( function(event) {
+    var topic = nconf.get('topic');
+    if (topic) {
+        console.log("* Listening for tweets about: " + topic);
+        feed.publicStream(topic, function (event) {
+            if (event.event == 'posted' && event.subject == 'tweet') {
+                saveData(event.content, "tweets-" + topic);
+                emitTopic(event, topic);
+            }
+        });
+    }
+    if (nconf.get('user')) {
+        console.log("* Listening for user timeline tweets");
+        feed.userStream( function(event) {
 
-        if (event.event == 'posted' && event.subject == 'tweet') {
-            process.stdout.write('+');
-            saveData(event.content, "timeline");
-            emitTweet(event);
-        } else {
-            process.stdout.write(':');
-            saveData(event, "meta");
-            emitMeta(event);
-        }
-    });
+            if (event.event == 'posted' && event.subject == 'tweet') {
+                process.stdout.write('+');
+                saveData(event.content, "timeline");
+                emitTweet(event);
+            } else {
+                process.stdout.write(':');
+                saveData(event, "meta");
+                emitMeta(event);
+            }
+        });
+    }
 });
 
 process.on('SIGINT', function() {

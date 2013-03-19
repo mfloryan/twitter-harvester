@@ -21,3 +21,15 @@ In order to use the application provide a configuration file `config.json` with 
     }
 }
 ```
+
+## Command-line
+
+`node harvest.js --server` to start the stat server
+
+You can also start the stat-server in a separate process like this:
+
+`node stat-server.js`
+
+`node harvest.js --topic={topic}` to capture tweets on a particular topic
+
+`node harvest.js --user` to capture user's (based on the oauth details) timeline tweets
